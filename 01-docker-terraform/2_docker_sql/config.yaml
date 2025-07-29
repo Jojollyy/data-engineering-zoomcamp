@@ -1,0 +1,9 @@
+postgres:
+  user: root
+  password: root
+  host: pgdatabase
+  port: 5432
+  db: ny_taxi
+
+source_file: /app/sources.csv
+batch_size: 100_000

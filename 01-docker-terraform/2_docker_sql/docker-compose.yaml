@@ -9,11 +9,30 @@ services:
       - "./ny_taxi_postgres_data:/var/lib/postgresql/data:rw"
     ports:
       - "5432:5432"
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@admin.com
       - PGADMIN_DEFAULT_PASSWORD=root
+    volumes:
+      - pgadmin_conn_data:/var/lib/pgadmin:rw
     ports:
       - "8080:80"
-    
+      
+  ingest:
+      build: .
+      container_name: ingest-service
+      depends_on:
+        - pgdatabase
+      volumes:
+        - .:/app
+      command: ["python", "ingest_data.py", "--config=config.yaml"]
+
+volumes:
+  pgadmin_conn_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PWD}/pgadmin_conn_data

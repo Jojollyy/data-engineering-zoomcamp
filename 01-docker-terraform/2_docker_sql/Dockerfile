@@ -1,9 +1,24 @@
-FROM python:3.9.1
+FROM python:3.10-slim
 
-RUN apt-get install wget
-RUN pip install pandas sqlalchemy psycopg2
+# Install system dependencies for pyarrow, psycopg2, and compiling tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    build-essential \
+    curl \
+    wget \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
+# Set working directory
 WORKDIR /app
-COPY ingest_data.py ingest_data.py 
 
-ENTRYPOINT [ "python", "ingest_data.py" ]
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY . .
+
+# Set default command (optional, replace with your actual entrypoint if needed)
+CMD ["python", "ingest_data.py"]
